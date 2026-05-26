@@ -1,10 +1,19 @@
-import sqlalchemy
-from sqlalchemy import create_engine, text
+from sqlalchemy import create_engine
+from sqlalchemy import text
+from dotenv import load_dotenv
+import os
+
+load_dotenv()
+doc_string = os.getenv('doc_string')
 
 engine = create_engine(
-    "mysql+pymysql://root:password@127.0.0.1:3306/jobs?charset=utf8mb4"
+    doc_string
 )
-
-with engine.connect() as conn:
-    result = conn.execute(text("select * from jobs"))
-    print(result.all())
+def load_jobs_from_db():
+    with engine.connect() as conn:
+        result = conn.execute(text("select * from jobs"))
+        result_dicts = []
+        for row in result.all():
+            result_dicts.append(dict(row._mapping))
+        print(result_dicts)
+        return result_dicts
